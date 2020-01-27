@@ -1,4 +1,9 @@
 body {
 
-    
+
+}
+.jumbotron {
+    background-image: url('/image/marches.png');
+    background-repeat: no-repeat;
+    background-size: cover;
 }
