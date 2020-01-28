@@ -52,8 +52,46 @@ class GoogleAuthenticator extends AbstractGuardAuthenticator
             return;
         }
 
-        dump($idToken);
+        $client = new \Google_Client([
+            'client_id' => $_ENV['GOOGLE_CLIENT_ID']
+        ]);
+
+        try {
+
+            $payload = $client->verifyIdToken($idToken);
+
+        } catch (\Exception $e) {
+            return;
+        }
+
+        $user = $this->em
+        ->getRepository(User::class)
+        ->findOneBy([
+            'googleId' => $payload['sub']
+        ]);
+
+
+        // si l'utilisateur n'existe pas, on essai de le récupérer par l'email
+        if (!$user) {
+            $user = $this->em
+            ->getRepository(User::class)
+            ->findOneBy([
+                'email' => $payload['email']
+            ]);
+            if (!$user) {
+                $user = new User;
+                $user->setEmail($payload ['email']);
+            }
+        }
+
+        $user->setGoogleId($payload['sub']);
+
+        $this->em->persist($user);
+        $this->em->flush();
+
+        dump($user);
         die;
+        return $user;
         // if a User object, checkCredentials() is called
         return $this->em->getRepository(User::class)
             ->findOneBy(['apiToken' => $apiToken]);
