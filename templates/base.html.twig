@@ -39,11 +39,39 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
         <script src="https://apis.google.com/js/platform.js" async defer></script>
         <script>
+
+            function getCookie(cname) {
+                var name = cname + "=";
+                var decodedCookie = decodeURIComponent(document.cookie);
+                var ca = decodedCookie.split(';');
+                for(var i = 0; i <ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) == ' ') {
+                        c = c.substring(1);
+                    }
+                    if (c.indexOf(name) == 0) {
+                        return c.substring(name.length, c.length);
+                    }
+                }
+                return "";
+            }
+
+            const googleId = getCookie('GOOGLE_ID')
+
             function onSignIn(googleUser) {
                 var profile = googleUser.getBasicProfile();
                 var id_token = googleUser.getAuthResponse().id_token;
-                console.log(id_token);
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '{{ path('app_login_google') }}');
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function() {
+                    //window.location.href = '{{ path ('home') }}'//
+
+                };
+                xhr.send('id_token=' + id_token);
+                console.log('id_token');
             }
+
             function signOut() {
                 var auth2 = gapi.auth2.getAuthInstance();
                 auth2.signOut().then(function () {

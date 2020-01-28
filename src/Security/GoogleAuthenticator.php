@@ -89,12 +89,7 @@ class GoogleAuthenticator extends AbstractGuardAuthenticator
         $this->em->persist($user);
         $this->em->flush();
 
-        dump($user);
-        die;
         return $user;
-        // if a User object, checkCredentials() is called
-        return $this->em->getRepository(User::class)
-            ->findOneBy(['apiToken' => $apiToken]);
     }
 
     public function checkCredentials($credentials, UserInterface $user)
